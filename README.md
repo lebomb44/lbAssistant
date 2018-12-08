@@ -1,5 +1,7 @@
 # lbAssistant
 
+Create service file
+```shell
 sudo vi /lib/systemd/system/lbAssistant.service
 [Unit]
 Description=My awesome assistant app
@@ -13,9 +15,16 @@ User=pi
 
 [Install]
 WantedBy=multi-user.target
-
+```
+Enable the service
+```shel
 sudo systemctl enable lbAssistant.service
+```
+Check the status of the service
+```shell
 sudo service lbAssistant status
+```
+Start the service
+```shell
 sudo service lbAssistant start
-sudo service lbAssistant stop
-
+```
