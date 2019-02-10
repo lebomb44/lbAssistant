@@ -31,12 +31,18 @@ import threading
 import schedule
 import time
 
+import w1Temp
+import remote
+
 from google.assistant.library.event import EventType
 
 from aiy.assistant import auth_helpers
 from aiy.assistant.library import Assistant
 from aiy.board import Board, Led
 from aiy.voice import tts
+
+system_status = dict() #"Tous les systemes sont operationnels"
+
 
 def log(msg):
     print(time.strftime('%Y/%m/%d %H:%M:%S: ') + msg)
@@ -50,33 +56,38 @@ def httpRequest(url):
         pass
 
 
+def lbsay(text, volume=20, speed=100):
+    log("I said: " + text)
+    tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
+
+
 def waterMainOn():
-    tts.say('La pompe est en marche', lang="fr-FR", volume=20)
+    lbsay('La pompe est en marche')
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
 
 
 def waterMainOff():
-    tts.say('La pompe est arrêtée', lang="fr-FR", volume=20)
+    lbsay('La pompe est arrêtée')
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
 
 
 def diningShutterOpen():
-    tts.say('Ouverture des volets du salon', lang="fr-FR", volume=20)
+    lbsay('Ouverture des volets du salon')
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=180")
 
 
 def diningShutterClose():
-    tts.say('Fermeture des volets du salon', lang="fr-FR", volume=20)
+    lbsay('Fermeture des volets du salon')
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=181")
 
 
 def allShutterOpen():
-    tts.say('Ouverture de tous les volets', lang="fr-FR", volume=20)
+    lbsay('Ouverture de tous les volets')
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=205")
 
 
 def allShutterClose():
-    tts.say('Fermeture de tous les volets', lang="fr-FR", volume=20)
+    lbsay('Fermeture de tous les volets')
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=206")
 
 
@@ -84,11 +95,11 @@ def process_event(assistant, led, event):
     logging.info(event)
     if event.type == EventType.ON_START_FINISHED:
         led.state = Led.BEACON_DARK  # Ready.
-        print('Say "OK, Google" then speak, or press Ctrl+C to quit...')
+        log('Say "OK, Google" then speak, or press Ctrl+C to quit...')
     elif event.type == EventType.ON_CONVERSATION_TURN_STARTED:
         led.state = Led.ON  # Listening.
     elif event.type == EventType.ON_RECOGNIZING_SPEECH_FINISHED and event.args:
-        print('You said:', event.args['text'])
+        log('You said: ' + event.args['text'])
         text = event.args['text'].lower()
         if text == 'allume la pompe':
             assistant.stop_conversation()
@@ -108,6 +119,18 @@ def process_event(assistant, led, event):
         elif text == 'ferme tous les volets':
             assistant.stop_conversation()
             allShutterClose()
+        elif text == 'combien fait-il':
+            assistant.stop_conversation()
+            lbsay('La température est de, ' + w1Temp.read_temp() + " degrés Celsius", speed=80)
+        elif text == 'comment vas-tu':
+            assistant.stop_conversation()
+            error_found = False
+            for key, value in system_status.items():
+                if "" != value:
+                    error_found = True
+                    lbsay(value)
+            if error_found is False:
+                lbsay("Tous les systèmes sont opérationnels")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
@@ -119,13 +142,24 @@ def process_event(assistant, led, event):
 
 
 def sayWeather(assistant):
-    print("sayWeather execution")
+    log("sayWeather execution")
     assistant.send_text_query('quel sera la meteo')
 
 
 def sayWorkPath(assistant):
-    print("sayWorkPath execution")
-    assistant.send_text_query('combien de temps pour aller au travail')
+    log("sayWorkPath execution")
+    assist738ant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
+
+
+def checkSystem(assistant):
+    log("Checking system")
+    system_status["osmc_disk"] = remote.checkdisk("osmc", "osmc", "/")
+    system_status["osmc_hdd"] = remote.checkdisk("osmc", "osmc", "/media/HDD", 95)
+    system_status["osmc_http"] = remote.checkhttp("sno.ddns.net/ping", "OSMC", "pong")
+    system_status["jeedom_disk"] = remote.checkdisk("jeedom", "jeedom", "/")
+    #system_status["camdining_disk"] = remote.checkdisk("camdining", "pi", "/")
+    #system_status["camentry_disk"] = remote.checkdisk("camentry", "pi", "/")
+    #log(str(system_status))
 
 
 def schedule_thread(schedule):
@@ -140,8 +174,10 @@ def main():
     with Board() as board, Assistant(credentials) as assistant:
         schedule.every().day.at("07:30").do(sayWeather, assistant)
         schedule.every().day.at("07:45").do(sayWorkPath, assistant)
+        schedule.every(15).minutes.do(checkSystem, assistant)
         worker_thread = threading.Thread(target=schedule_thread, args=(schedule,))
         worker_thread.start()
+        checkSystem(assistant)
         for event in assistant.start():
             process_event(assistant, board.led, event)
 
