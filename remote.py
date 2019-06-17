@@ -5,7 +5,7 @@ import subprocess
 import requests
 
 
-def checkdisk(target, user, path, level=80):
+def checkdisk(target, target_name, user, path, level=80):
     try:
         result = subprocess.run(["ssh", user + "@" + target, "df -h " + path],
                             shell=False,
@@ -18,9 +18,11 @@ def checkdisk(target, user, path, level=80):
             if len(resp_array) == 15:
                 if int(resp_array[13].replace("%","")) < level:
                     return ""
+        print("ERROR checkdisk(target=" + target + " ,target_name=" + target_name + " ,user=" + user + " ,path=" + path + " ,level=" + str(level) + ")")
+        print("LOG result=" + str(result))
         raise ValueError("Bad SSH call")
     except:
-        return "Disque plein sur " + target
+        return "Disque plein sur " + target_name
 
 def checkhttp(url, url_name, answer):
     try:

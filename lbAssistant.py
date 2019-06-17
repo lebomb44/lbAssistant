@@ -56,7 +56,7 @@ def httpRequest(url):
         pass
 
 
-def lbsay(text, volume=20, speed=100):
+def lbsay(text, volume=60, speed=100):
     log("I said: " + text)
     tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
@@ -69,6 +69,16 @@ def waterMainOn():
 def waterMainOff():
     lbsay('La pompe est arrêtée')
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
+
+
+def waterGardenOn():
+    lbsay('L\'eau du potager est ouverte')
+    httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/1")
+
+
+def waterGardenOff():
+    lbsay('L\'eau du potager est coupée')
+    httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/0")
 
 
 def diningShutterOpen():
@@ -107,6 +117,12 @@ def process_event(assistant, led, event):
         elif text == 'arrête la pompe':
             assistant.stop_conversation()
             waterMainOff()
+        elif text == 'allume le potager':
+            assistant.stop_conversation()
+            waterGardenOn()
+        elif text == 'arrête le potager':
+            assistant.stop_conversation()
+            waterGardenOff()
         elif text == 'ouvre les volets du salon':
             assistant.stop_conversation()
             diningShutterOpen()
@@ -148,17 +164,17 @@ def sayWeather(assistant):
 
 def sayWorkPath(assistant):
     log("sayWorkPath execution")
-    assist738ant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
+    assistant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
 
 
 def checkSystem(assistant):
     log("Checking system")
-    system_status["osmc_disk"] = remote.checkdisk("osmc", "osmc", "/")
-    system_status["osmc_hdd"] = remote.checkdisk("osmc", "osmc", "/media/HDD", 95)
-    system_status["osmc_http"] = remote.checkhttp("sno.ddns.net/ping", "OSMC", "pong")
-    system_status["jeedom_disk"] = remote.checkdisk("jeedom", "jeedom", "/")
-    #system_status["camdining_disk"] = remote.checkdisk("camdining", "pi", "/")
-    #system_status["camentry_disk"] = remote.checkdisk("camentry", "pi", "/")
+    system_status["osmc_disk"] = remote.checkdisk("osmc", "'O S M C' racine", "osmc", "/")
+    system_status["osmc_hdd"] = remote.checkdisk("osmc", "'O S M C' 'H D D'", "osmc", "/media/HDD", 95)
+    system_status["osmc_http"] = remote.checkhttp("sno.ddns.net/ping", "'O S M C' ping", "pong")
+    system_status["jeedom_disk"] = remote.checkdisk("jeedom", "JIDOM", "jeedom", "/")
+    #system_status["camdining_disk"] = remote.checkdisk("camdining", "CAM DINING", "pi", "/")
+    #system_status["camentry_disk"] = remote.checkdisk("camentry", "CAM ENTRY", "pi", "/")
     #log(str(system_status))
 
 
