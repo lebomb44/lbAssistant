@@ -26,7 +26,7 @@ def checkdisk(target, target_name, user, path, level=80):
 
 def checkhttp(url, url_name, answer):
     try:
-        r = requests.get(url, timeout=0.1)
+        r = requests.get(url, timeout=0.1, verify=False)
         if 200 == r.status_code:
             if answer == r.text:
                 return ""

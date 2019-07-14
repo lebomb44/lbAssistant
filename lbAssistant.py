@@ -30,6 +30,7 @@ import requests
 import threading
 import schedule
 import time
+import os
 
 import w1Temp
 import remote
@@ -72,12 +73,14 @@ def waterMainOff():
 
 
 def waterGardenOn():
-    lbsay('L\'eau du potager est ouverte')
+    lbsay('La pompe et l\'eau du potager sont en marche')
+    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/1")
 
 
 def waterGardenOff():
-    lbsay('L\'eau du potager est coupée')
+    lbsay('La pompe et l\'eau du potager sont arrêtés')
+    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/0")
 
 
@@ -137,7 +140,7 @@ def process_event(assistant, led, event):
             allShutterClose()
         elif text == 'combien fait-il':
             assistant.stop_conversation()
-            lbsay('La température est de, ' + w1Temp.read_temp() + " degrés Celsius", speed=80)
+            lbsay('La température est de, ' + w1Temp.read_temp() + ' degrés Celsius', speed=80)
         elif text == 'comment vas-tu':
             assistant.stop_conversation()
             error_found = False
@@ -146,7 +149,27 @@ def process_event(assistant, led, event):
                     error_found = True
                     lbsay(value)
             if error_found is False:
-                lbsay("Tous les systèmes sont opérationnels")
+                lbsay('Tous les systèmes sont opérationnels')
+        elif text == "redémarre l'assistant":
+            assistant.stop_conversation()
+            lbsay("Redémarrage de l'assistant en cours", speed=80)
+            os.system('sudo reboot')
+        elif text == "allume l'alarme":
+            assistant.stop_conversation()
+            lbsay("Démarrage de l'alarme")
+            for i in range(10,0,-1):
+                lbsay(str(i), speed=80)
+                time.sleep(1)
+            httpRequest("http://192.168.10.4:8444/api/lbgate/alarm/enable")
+            lbsay("L'alarme est allumée")
+        elif text == "arrête l'alarme":
+            assistant.stop_conversation()
+            httpRequest("http://192.168.10.4:8444/api/lbgate/alarm/disable")
+            lbsay("L'alarme est arrêtée")
+        elif text == "mets-nous en sécurité":
+            assistant.stop_conversation()
+            httpRequest("http://192.168.10.4:8444/api/lbgate/perimeter/enable")
+            lbsay("La maison est sécurisée")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
