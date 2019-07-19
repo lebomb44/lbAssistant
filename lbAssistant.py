@@ -25,12 +25,11 @@ import logging
 import platform
 import subprocess
 import sys
+import os
 import time
 import requests
 import threading
 import schedule
-import time
-import os
 
 import w1Temp
 import remote
@@ -46,10 +45,12 @@ system_status = dict() #"Tous les systemes sont operationnels"
 
 
 def log(msg):
+    """ Print log message with date """
     print(time.strftime('%Y/%m/%d %H:%M:%S: ') + msg)
 
 
 def httpRequest(url):
+    """ Call HTTP request catching all errors """
     try:
         log("URL call: " + url)
         requests.get(url, timeout=0.1)
@@ -58,6 +59,7 @@ def httpRequest(url):
 
 
 def lbsay(text, volume=60, speed=100):
+    """ Text to speech """
     log("I said: " + text)
     tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
@@ -157,7 +159,7 @@ def process_event(assistant, led, event):
         elif text == "allume l'alarme":
             assistant.stop_conversation()
             lbsay("Démarrage de l'alarme")
-            for i in range(10,0,-1):
+            for i in range(10, 0, -1):
                 lbsay(str(i), speed=80)
                 time.sleep(1)
             httpRequest("http://192.168.10.4:8444/api/lbgate/alarm/enable")
