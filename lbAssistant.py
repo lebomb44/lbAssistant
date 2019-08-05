@@ -42,7 +42,7 @@ from aiy.board import Board, Led
 from aiy.voice import tts
 
 system_status = dict() #"Tous les systemes sont operationnels"
-notificationIsOn = True
+notification_is_on = True
 schedule_watering = False
 
 def log(msg):
@@ -59,14 +59,15 @@ def httpRequest(url):
             lbSay("La requete a échoué")
         return resp
     except:
-        pass
+        return None
 
 
 def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
     """ Text to speech """
+    global notification_is_on
     log("I said: " + text)
     if isNotification is True:
-        if notificationIsOn is False:
+        if notification_is_on is False:
             return
     if silent is False:
         tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
@@ -78,6 +79,7 @@ def waterMainOn(silent=False):
 
 
 def schedule_waterMainOn():
+    global schedule_watering
     if schedule_watering is True:
         waterMainOn(silent=True)
 
@@ -88,8 +90,31 @@ def waterMainOff(silent=False):
 
 
 def schedule_waterMainOff():
+    global schedule_watering
     if schedule_watering is True:
         waterMainOff(silent=True)
+
+
+def waterSideOn(silent=False):
+    lbsay('L\'arrosage sur le coté est en marche', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterSideRelay/set/1")
+
+
+def schedule_waterSideOn():
+    global schedule_watering
+    if schedule_watering is True:
+        waterSideOn(silent=True)
+
+
+def waterSideOff(silent=False):
+    lbsay('L\'arrosage sur le coté est arrêtée', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterSideRelay/set/0")
+
+
+def schedule_waterSideOff():
+    global schedule_watering
+    if schedule_watering is True:
+        waterSideOff(silent=True)
 
 
 def waterEastOn(silent=False):
@@ -98,6 +123,7 @@ def waterEastOn(silent=False):
 
 
 def schedule_waterEastOn():
+    global schedule_watering
     if schedule_watering is True:
         waterEastOn(silent=True)
 
@@ -108,6 +134,7 @@ def waterEastOff(silent=False):
 
 
 def schedule_waterEastOff():
+    global schedule_watering
     if schedule_watering is True:
         waterEastOff(silent=True)
 
@@ -118,6 +145,7 @@ def waterWestOn(silent=False):
 
 
 def schedule_waterWestOn():
+    global schedule_watering
     if schedule_watering is True:
         waterWestOn(silent=True)
 
@@ -128,6 +156,7 @@ def waterWestOff(silent=False):
 
 
 def schedule_waterWestOff():
+    global schedule_watering
     if schedule_watering is True:
         waterWestOff(silent=True)
 
@@ -138,6 +167,7 @@ def waterSouthOn(silent=False):
 
 
 def schedule_waterSouthOn():
+    global schedule_watering
     if schedule_watering is True:
         waterSouthOn(silent=True)
 
@@ -148,6 +178,7 @@ def waterSouthOff(silent=False):
 
 
 def schedule_waterSouthOff():
+    global schedule_watering
     if schedule_watering is True:
         waterSouthOff(silent=True)
 
@@ -159,6 +190,7 @@ def waterGardenOn(silent=False):
 
 
 def schedule_waterGardenOn():
+    global schedule_watering
     if schedule_watering is True:
         waterGardenOn(silent=True)
 
@@ -170,6 +202,7 @@ def waterGardenOff(silent=False):
 
 
 def schedule_waterGardenOff():
+    global schedule_watering
     if schedule_watering is True:
         waterGardenOff(silent=True)
 
@@ -195,6 +228,9 @@ def allShutterClose(silent=False):
 
 
 def process_event(assistant, led, event):
+    global system_status
+    global notification_is_on
+    global schedule_watering
     logging.info(event)
     if event.type == EventType.ON_START_FINISHED:
         led.state = Led.BEACON_DARK  # Ready.
@@ -233,8 +269,13 @@ def process_event(assistant, led, event):
             lbsay('La température est de, ' + w1Temp.read_temp() + ' degrés Celsius', speed=80)
         elif text == 'combien fait-il dehors':
             assistant.stop_conversation()
-            resp = httpRequest("http://192.168.10.4:8444/api/lbgate/json")
-            lbsay('La température extérieure est de, ' + str(resp.json().ext.tempSensors["287979C8070000D1"].val) + ' degrés Celsius', speed=80)
+            temp = "inconnue"
+            try:
+                resp = httpRequest("http://192.168.10.4:8444/api/lbgate/json")
+                temp = str(resp.json().ext.tempSensors["287979C8070000D1"].val)
+            except:
+                pass
+            lbsay('La température extérieure est de, ' + temp + ' degrés Celsius', speed=80)
         elif text == 'comment vas-tu':
             assistant.stop_conversation()
             error_found = False
@@ -266,15 +307,15 @@ def process_event(assistant, led, event):
             lbsay("La maison est sécurisée")
         elif text == "allume les notifications":
             assistant.stop_conversation()
-            notificationIsOn = True
+            notification_is_on = True
             lbsay("Les notifications sont en marche")
         elif text == "arrête les notifications":
             assistant.stop_conversation()
-            notificationIsOn = False
+            notification_is_on = False
             lbsay("Les notifications sont arrêtées")
         elif text == "comment sont les notifications":
             assistant.stop_conversation()
-            if notificationIsOn is True:
+            if notification_is_on is True:
                 lbsay("Les notifications sont en marche")
             else:
                 lbsay("Les notifications sont arrêtées")
@@ -297,18 +338,21 @@ def process_event(assistant, led, event):
 
 
 def sayWeather(assistant):
-    if notificationIsOn is True:
+    global notification_is_on
+    if notification_is_on is True:
         log("sayWeather execution")
         assistant.send_text_query('quel sera la meteo')
 
 
 def sayWorkPath(assistant):
-    if notificationIsOn is True:
+    global notification_is_on
+    if notification_is_on is True:
         log("sayWorkPath execution")
         assistant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
 
 
 def checkSystem(assistant):
+    global system_status
     log("Checking system")
     system_status["osmc_disk"] = remote.checkdisk("osmc", "'O S M C' racine", "osmc", "/")
     system_status["osmc_hdd"] = remote.checkdisk("osmc", "'O S M C' 'H D D'", "osmc", "/media/HDD", 95)
