@@ -61,54 +61,55 @@ def httpRequest(url):
         pass
 
 
-def lbsay(text, volume=60, speed=100, isNotification=False):
+def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
     """ Text to speech """
     log("I said: " + text)
     if isNotification is True:
         if notificationIsOn is False:
             return
-    tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
+    if silent is False:
+        tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
 
-def waterMainOn():
-    lbsay('La pompe est en marche')
+def waterMainOn(silent=False):
+    lbsay('La pompe est en marche', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
 
 
-def waterMainOff():
-    lbsay('La pompe est arrêtée')
+def waterMainOff(silent=False):
+    lbsay('La pompe est arrêtée', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
 
 
-def waterGardenOn():
-    lbsay('La pompe et l\'eau du potager sont en marche')
+def waterGardenOn(silent=False):
+    lbsay('La pompe et l\'eau du potager sont en marche', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/1")
 
 
-def waterGardenOff():
-    lbsay('La pompe et l\'eau du potager sont arrêtés')
+def waterGardenOff(silent=False):
+    lbsay('La pompe et l\'eau du potager sont arrêtés', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/0")
 
 
-def diningShutterOpen():
-    lbsay('Ouverture des volets du salon')
+def diningShutterOpen(silent=False):
+    lbsay('Ouverture des volets du salon', silent=silent)
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=180")
 
 
-def diningShutterClose():
-    lbsay('Fermeture des volets du salon')
+def diningShutterClose(silent=False):
+    lbsay('Fermeture des volets du salon', silent=silent)
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=181")
 
 
-def allShutterOpen():
-    lbsay('Ouverture de tous les volets')
+def allShutterOpen(silent=False):
+    lbsay('Ouverture de tous les volets', silent=silent)
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=205")
 
 
-def allShutterClose():
-    lbsay('Fermeture de tous les volets')
+def allShutterClose(silent=False):
+    lbsay('Fermeture de tous les volets', silent=silent)
     httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=nAx7bK300sR01CCq20mXJbsYaYcWc84hfPEY3W1Rnh27BTDb&type=cmd&id=206")
 
 
