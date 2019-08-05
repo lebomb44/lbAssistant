@@ -53,7 +53,10 @@ def httpRequest(url):
     """ Call HTTP request catching all errors """
     try:
         log("URL call: " + url)
-        requests.get(url, timeout=0.1)
+        resp = requests.get(url, timeout=0.1)
+        if resp.status_code != 200:
+            lbSay("La requete a échoué")
+        return resp
     except:
         pass
 
@@ -146,6 +149,10 @@ def process_event(assistant, led, event):
         elif text == 'combien fait-il':
             assistant.stop_conversation()
             lbsay('La température est de, ' + w1Temp.read_temp() + ' degrés Celsius', speed=80)
+        elif text == 'combien fait-il dehors':
+            assistant.stop_conversation()
+            resp = httpRequest("http://192.168.10.4:8444/api/lbgate/json")
+            lbsay('La température extérieure est de, ' + str(resp.json().ext.tempSensors["287979C8070000D1"].val) + ' degrés Celsius', speed=80)
         elif text == 'comment vas-tu':
             assistant.stop_conversation()
             error_found = False
