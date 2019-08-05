@@ -278,6 +278,14 @@ def process_event(assistant, led, event):
                 lbsay("Les notifications sont en marche")
             else:
                 lbsay("Les notifications sont arrêtées")
+        elif text == "active l'arrosage automatique":
+            assistant.stop_conversation()
+            schedule_watering = True
+            lbsay("L'arrosage automatique est activé. Démarrage cette nuit à une heure")
+        elif text == "désactive l'arrosage automatique":
+            assistant.stop_conversation()
+            schedule_watering = False
+            lbsay("L'arrosage automatique est désactivé")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
