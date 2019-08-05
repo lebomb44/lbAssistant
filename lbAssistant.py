@@ -43,6 +43,7 @@ from aiy.voice import tts
 
 system_status = dict() #"Tous les systemes sont operationnels"
 notificationIsOn = True
+schedule_watering = False
 
 def log(msg):
     """ Print log message with date """
@@ -76,9 +77,79 @@ def waterMainOn(silent=False):
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
 
 
+def schedule_waterMainOn():
+    if schedule_watering is True:
+        waterMainOn(silent=True)
+
+
 def waterMainOff(silent=False):
     lbsay('La pompe est arrêtée', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
+
+
+def schedule_waterMainOff():
+    if schedule_watering is True:
+        waterMainOff(silent=True)
+
+
+def waterEastOn(silent=False):
+    lbsay('L\'arrosage est est en marche', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterEastRelay/set/1")
+
+
+def schedule_waterEastOn():
+    if schedule_watering is True:
+        waterEastOn(silent=True)
+
+
+def waterEastOff(silent=False):
+    lbsay('L\'arrosage est est arrêtée', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterEastRelay/set/0")
+
+
+def schedule_waterEastOff():
+    if schedule_watering is True:
+        waterEastOff(silent=True)
+
+
+def waterWestOn(silent=False):
+    lbsay('L\'arrosage ouest est en marche', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterWestRelay/set/1")
+
+
+def schedule_waterWestOn():
+    if schedule_watering is True:
+        waterWestOn(silent=True)
+
+
+def waterWestOff(silent=False):
+    lbsay('L\'arrosage ouest est arrêtée', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterWestRelay/set/0")
+
+
+def schedule_waterWestOff():
+    if schedule_watering is True:
+        waterWestOff(silent=True)
+
+
+def waterSouthOn(silent=False):
+    lbsay('L\'arrosage sud est en marche', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterSouthRelay/set/1")
+
+
+def schedule_waterSouthOn():
+    if schedule_watering is True:
+        waterSouthOn(silent=True)
+
+
+def waterSouthOff(silent=False):
+    lbsay('L\'arrosage sud est arrêtée', silent=silent)
+    httpRequest("http://192.168.10.4:8444/api/ext/waterSouthRelay/set/0")
+
+
+def schedule_waterSouthOff():
+    if schedule_watering is True:
+        waterSouthOff(silent=True)
 
 
 def waterGardenOn(silent=False):
@@ -87,10 +158,20 @@ def waterGardenOn(silent=False):
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/1")
 
 
+def schedule_waterGardenOn():
+    if schedule_watering is True:
+        waterGardenOn(silent=True)
+
+
 def waterGardenOff(silent=False):
     lbsay('La pompe et l\'eau du potager sont arrêtés', silent=silent)
     httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
     httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/0")
+
+
+def schedule_waterGardenOff():
+    if schedule_watering is True:
+        waterGardenOff(silent=True)
 
 
 def diningShutterOpen(silent=False):
@@ -240,6 +321,16 @@ def main():
     logging.basicConfig(level=logging.INFO)
     credentials = auth_helpers.get_assistant_credentials()
     with Board() as board, Assistant(credentials) as assistant:
+        schedule.every().day.at("01:00").do(schedule_waterMainOn, True)
+        schedule.every().day.at("01:01").do(schedule_waterSideOn, True)
+        schedule.every().day.at("01:15").do(schedule_waterSideOff, True)
+        schedule.every().day.at("01:16").do(schedule_waterEastOn, True)
+        schedule.every().day.at("01:30").do(schedule_waterEastOff, True)
+        schedule.every().day.at("01:31").do(schedule_waterWestOn, True)
+        schedule.every().day.at("01:45").do(schedule_waterWestOff, True)
+        schedule.every().day.at("01:46").do(schedule_waterSouthOn, True)
+        schedule.every().day.at("00:00").do(schedule_waterSouthOff, True)
+        schedule.every().day.at("02:00").do(schedule_waterMainOff, True)
         schedule.every().day.at("07:30").do(sayWeather, assistant)
         schedule.every().day.at("07:45").do(sayWorkPath, assistant)
         schedule.every(15).minutes.do(checkSystem, assistant)
