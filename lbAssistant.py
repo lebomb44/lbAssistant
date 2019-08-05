@@ -42,7 +42,7 @@ from aiy.board import Board, Led
 from aiy.voice import tts
 
 system_status = dict() #"Tous les systemes sont operationnels"
-
+notificationIsOn = True
 
 def log(msg):
     """ Print log message with date """
@@ -58,9 +58,12 @@ def httpRequest(url):
         pass
 
 
-def lbsay(text, volume=60, speed=100):
+def lbsay(text, volume=60, speed=100, isNotification=False):
     """ Text to speech """
     log("I said: " + text)
+    if isNotification is True:
+        if notificationIsOn is False:
+            return
     tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
 
@@ -172,6 +175,20 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             httpRequest("http://192.168.10.4:8444/api/lbgate/perimeter/enable")
             lbsay("La maison est sécurisée")
+        elif text == "allume les notifications":
+            assistant.stop_conversation()
+            notificationIsOn = True
+            lbsay("Les notifications sont en marche")
+        elif text == "arrête les notifications":
+            assistant.stop_conversation()
+            notificationIsOn = False
+            lbsay("Les notifications sont arrêtées")
+        elif text == "comment sont les notifications":
+            assistant.stop_conversation()
+            if notificationIsOn is True:
+                lbsay("Les notifications sont en marche")
+            else:
+                lbsay("Les notifications sont arrêtées")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
@@ -183,13 +200,15 @@ def process_event(assistant, led, event):
 
 
 def sayWeather(assistant):
-    log("sayWeather execution")
-    assistant.send_text_query('quel sera la meteo')
+    if notificationIsOn is True:
+        log("sayWeather execution")
+        assistant.send_text_query('quel sera la meteo')
 
 
 def sayWorkPath(assistant):
-    log("sayWorkPath execution")
-    assistant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
+    if notificationIsOn is True:
+        log("sayWorkPath execution")
+        assistant.send_text_query('combien de temps pour aller chez Airbus rue des cosmonautes')
 
 
 def checkSystem(assistant):
