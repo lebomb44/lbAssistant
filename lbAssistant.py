@@ -272,7 +272,7 @@ def process_event(assistant, led, event):
             temp = "inconnue"
             try:
                 resp = httpRequest("http://192.168.10.4:8444/api/lbgate/json")
-                temp = str(resp.json().ext.tempSensors["287979C8070000D1"].val)
+                temp = str(round(int(resp.json()['ext']['tempSensors']['287979C8070000D1']['val']), 1))
             except:
                 pass
             lbsay('La température extérieure est de, ' + temp + ' degrés Celsius', speed=80)
@@ -381,8 +381,8 @@ def main():
         schedule.every().day.at("01:31").do(schedule_waterWestOn)
         schedule.every().day.at("01:45").do(schedule_waterWestOff)
         schedule.every().day.at("01:46").do(schedule_waterSouthOn)
-        schedule.every().day.at("00:00").do(schedule_waterSouthOff)
-        schedule.every().day.at("02:00").do(schedule_waterMainOff)
+        schedule.every().day.at("02:00").do(schedule_waterSouthOff)
+        schedule.every().day.at("02:01").do(schedule_waterMainOff)
         schedule.every().day.at("07:30").do(sayWeather, assistant)
         schedule.every().day.at("07:45").do(sayWorkPath, assistant)
         schedule.every(15).minutes.do(checkSystem, assistant)
