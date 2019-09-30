@@ -209,22 +209,26 @@ def schedule_waterGardenOff():
 
 def diningShutterOpen(silent=False):
     lbsay('Ouverture des volets du salon', silent=silent)
-    httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=132")
+    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=132")
+    httpRequest("http://192.168.10.4:8444/api/rts/ON/ID/12/RTS")
 
 
 def diningShutterClose(silent=False):
     lbsay('Fermeture des volets du salon', silent=silent)
-    httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=133")
+    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=133")
+    httpRequest("http://192.168.10.4:8444/api/rts/OFF/ID/12/RTS")
 
 
 def allShutterOpen(silent=False):
     lbsay('Ouverture de tous les volets', silent=silent)
-    httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
+    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
+    httpRequest("http://192.168.10.4:8444/api/rts/ON/ID/22/RTS")
 
 
 def allShutterClose(silent=False):
     lbsay('Fermeture de tous les volets', silent=silent)
-    httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=153")
+    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=153")
+    httpRequest("http://192.168.10.4:8444/api/rts/OFF/ID/22/RTS")
 
 
 def process_event(assistant, led, event):
