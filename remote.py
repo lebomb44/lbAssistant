@@ -5,6 +5,10 @@
 
 import subprocess
 import requests
+import urllib3
+
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def checkdisk(target, target_name, user, path, level=80):
@@ -19,13 +23,18 @@ def checkdisk(target, target_name, user, path, level=80):
         if result.returncode == 0:
             resp_array = result.stdout.decode('utf-8').split()
             if len(resp_array) == 15:
-                if int(resp_array[13].replace("%", "")) < level:
+                rate = int(resp_array[13].replace("%", ""))
+                if rate < level:
                     return ""
-        print("ERROR checkdisk(target=" + target + " ,target_name=" + target_name + " ,user=" + user + " ,path=" + path + " ,level=" + str(level) + ")")
-        print("LOG result=" + str(result))
-        raise ValueError("Bad SSH call")
-    except:
-        return "Disque plein sur " + target_name
+                else:
+                    return "Disque plein a " + str(rate) + "% sur " + target_name
+            else:
+                return "Longueur incorrecte a " + str(len(resp_array)) + " pour le test disque sur " + target_name
+        else:
+            return "Code retour incorrect a " + str(int(result.returncode)) + " pour le test disque sur " + target_name
+    except Exception as ex:
+        print("ERROR: Exception checkdisk: " + str(ex))
+        return "Exception lors du test disque sur " + target_name
 
 def checkhttp(url, url_name, answer):
     """ Check correct execution of HTTP request """
@@ -34,6 +43,10 @@ def checkhttp(url, url_name, answer):
         if req.status_code == 200:
             if answer == req.text:
                 return ""
-        raise ValueError("Cannot access URL")
-    except:
-        return "Le serveur " + url_name + " est inaccessible"
+            else:
+                return "Reponse incorrecte a " + req.text + " pour le test d'acces sur " + url_name
+        else:
+            return "Code retour incorrect a " + str(req.status_code) + " pour le test d'acces sur " + url_name
+    except Exception as ex:
+        print("ERROR: Exception checkhttp: " + str(ex))
+        return "Exception lors du test d'acces sur " + url_name
