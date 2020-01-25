@@ -19,7 +19,7 @@ def checkdisk(target, target_name, user, path, level=80):
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                                 check=False,
-                                timeout=1.0)
+                                timeout=2.0)
         if result.returncode == 0:
             resp_array = result.stdout.decode('utf-8').split()
             if len(resp_array) == 15:
@@ -39,7 +39,7 @@ def checkdisk(target, target_name, user, path, level=80):
 def checkhttp(url, url_name, answer):
     """ Check correct execution of HTTP request """
     try:
-        req = requests.get(url, timeout=0.1, verify=False)
+        req = requests.get(url, timeout=1.0, verify=False)
         if req.status_code == 200:
             if answer == req.text:
                 return ""
