@@ -75,7 +75,7 @@ def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
 
 def waterMainOn(silent=False):
     lbsay('La pompe est en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterMainRelay/set/1")
 
 
 def schedule_waterMainOn():
@@ -86,7 +86,7 @@ def schedule_waterMainOn():
 
 def waterMainOff(silent=False):
     lbsay('La pompe est arrêtée', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterMainRelay/set/0")
 
 
 def schedule_waterMainOff():
@@ -97,7 +97,7 @@ def schedule_waterMainOff():
 
 def waterSideOn(silent=False):
     lbsay('L\'arrosage sur le coté est en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterSideRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterSideRelay/set/1")
 
 
 def schedule_waterSideOn():
@@ -108,7 +108,7 @@ def schedule_waterSideOn():
 
 def waterSideOff(silent=False):
     lbsay('L\'arrosage sur le coté est arrêtée', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterSideRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterSideRelay/set/0")
 
 
 def schedule_waterSideOff():
@@ -119,7 +119,7 @@ def schedule_waterSideOff():
 
 def waterEastOn(silent=False):
     lbsay('L\'arrosage est est en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterEastRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterEastRelay/set/1")
 
 
 def schedule_waterEastOn():
@@ -130,7 +130,7 @@ def schedule_waterEastOn():
 
 def waterEastOff(silent=False):
     lbsay('L\'arrosage est est arrêtée', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterEastRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterEastRelay/set/0")
 
 
 def schedule_waterEastOff():
@@ -141,7 +141,7 @@ def schedule_waterEastOff():
 
 def waterWestOn(silent=False):
     lbsay('L\'arrosage ouest est en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterWestRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterWestRelay/set/1")
 
 
 def schedule_waterWestOn():
@@ -152,7 +152,7 @@ def schedule_waterWestOn():
 
 def waterWestOff(silent=False):
     lbsay('L\'arrosage ouest est arrêtée', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterWestRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterWestRelay/set/0")
 
 
 def schedule_waterWestOff():
@@ -163,7 +163,7 @@ def schedule_waterWestOff():
 
 def waterSouthOn(silent=False):
     lbsay('L\'arrosage sud est en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterSouthRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterSouthRelay/set/1")
 
 
 def schedule_waterSouthOn():
@@ -174,7 +174,7 @@ def schedule_waterSouthOn():
 
 def waterSouthOff(silent=False):
     lbsay('L\'arrosage sud est arrêtée', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterSouthRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterSouthRelay/set/0")
 
 
 def schedule_waterSouthOff():
@@ -185,8 +185,8 @@ def schedule_waterSouthOff():
 
 def waterGardenOn(silent=False):
     lbsay('La pompe et l\'eau du potager sont en marche', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/1")
-    httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterMainRelay/set/1")
+    httpRequest("http://jeedom:8444/api/ext/waterGardenRelay/set/1")
 
 
 def schedule_waterGardenOn():
@@ -197,8 +197,8 @@ def schedule_waterGardenOn():
 
 def waterGardenOff(silent=False):
     lbsay('La pompe et l\'eau du potager sont arrêtés', silent=silent)
-    httpRequest("http://192.168.10.4:8444/api/ext/waterMainRelay/set/0")
-    httpRequest("http://192.168.10.4:8444/api/ext/waterGardenRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterMainRelay/set/0")
+    httpRequest("http://jeedom:8444/api/ext/waterGardenRelay/set/0")
 
 
 def schedule_waterGardenOff():
@@ -209,26 +209,26 @@ def schedule_waterGardenOff():
 
 def diningShutterOpen(silent=False):
     lbsay('Ouverture des volets du salon', silent=silent)
-    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=132")
-    httpRequest("http://192.168.10.4:8444/api/rts/ON/ID/12/RTS")
+    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=132")
+    httpRequest("http://jeedom:8444/api/rts/ON/ID/12/RTS")
 
 
 def diningShutterClose(silent=False):
     lbsay('Fermeture des volets du salon', silent=silent)
-    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=133")
-    httpRequest("http://192.168.10.4:8444/api/rts/OFF/ID/12/RTS")
+    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=133")
+    httpRequest("http://jeedom:8444/api/rts/OFF/ID/12/RTS")
 
 
 def allShutterOpen(silent=False):
     lbsay('Ouverture de tous les volets', silent=silent)
-    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
-    httpRequest("http://192.168.10.4:8444/api/rts/ON/ID/22/RTS")
+    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
+    httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
 
 
 def allShutterClose(silent=False):
     lbsay('Fermeture de tous les volets', silent=silent)
-    #httpRequest("http://192.168.10.4/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=153")
-    httpRequest("http://192.168.10.4:8444/api/rts/OFF/ID/22/RTS")
+    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=153")
+    httpRequest("http://jeedom:8444/api/rts/OFF/ID/22/RTS")
 
 
 def process_event(assistant, led, event):
@@ -275,7 +275,7 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             temp = "inconnue"
             try:
-                resp = httpRequest("http://192.168.10.4:8444/api/lbgate/json")
+                resp = httpRequest("http://jeedom:8444/api/lbgate/json")
                 temp = str(round(int(resp.json()['ext']['tempSensors']['287979C8070000D1']['val']), 1))
             except:
                 pass
@@ -299,15 +299,15 @@ def process_event(assistant, led, event):
             for i in range(10, 0, -1):
                 lbsay(str(i), speed=80)
                 time.sleep(1)
-            httpRequest("http://192.168.10.4:8444/api/lbgate/alarm/enable")
+            httpRequest("http://jeedom:8444/api/lbgate/alarm/enable")
             lbsay("L'alarme est allumée")
         elif text == "arrête l'alarme":
             assistant.stop_conversation()
-            httpRequest("http://192.168.10.4:8444/api/lbgate/alarm/disable")
+            httpRequest("http://jeedom:8444/api/lbgate/alarm/disable")
             lbsay("L'alarme est arrêtée")
         elif text == "mets-nous en sécurité":
             assistant.stop_conversation()
-            httpRequest("http://192.168.10.4:8444/api/lbgate/perimeter/enable")
+            httpRequest("http://jeedom:8444/api/lbgate/perimeter/enable")
             lbsay("La maison est sécurisée")
         elif text == "allume les notifications":
             assistant.stop_conversation()
@@ -331,6 +331,27 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             schedule_watering = False
             lbsay("L'arrosage automatique est désactivé")
+        elif text == "coupe le son de kodi":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
+        elif text == "mets le son de kodi a":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/vol/set/")
+        elif text == "mets le son de kodi a fond":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/volmax/set")
+        elif text == "baisse le son de kodi":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/voldown/set")
+        elif text == "monte le son de kodi":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/volup/set")
+        elif text == "arrête l'ampli":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/off/set")
+        elif text == "allume l'ampli":
+            assistant.stop_conversation()
+            httpRequest("http://osmc:8444/api/volcontrol/on/set")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
@@ -387,8 +408,8 @@ def main():
         schedule.every().day.at("01:46").do(schedule_waterSouthOn)
         schedule.every().day.at("02:00").do(schedule_waterSouthOff)
         schedule.every().day.at("02:01").do(schedule_waterMainOff)
-        schedule.every().day.at("07:30").do(sayWeather, assistant)
-        schedule.every().day.at("07:45").do(sayWorkPath, assistant)
+        #schedule.every().day.at("07:30").do(sayWeather, assistant)
+        #schedule.every().day.at("07:45").do(sayWorkPath, assistant)
         schedule.every(15).minutes.do(checkSystem, assistant)
         worker_thread = threading.Thread(target=schedule_thread, args=(schedule,))
         worker_thread.start()
