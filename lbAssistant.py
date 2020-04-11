@@ -47,7 +47,7 @@ notification_is_on = True
 schedule_watering = False
 
 nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
-radio_id_list = dict({'france info': 4232})
+radio_id_list = dict({'france info': 4232, 'rire et chansons': 5558})
 
 
 def log(msg):
@@ -77,7 +77,7 @@ def httpRequest(url, timeout=0.1):
         return None
 
 
-def httpPostRequest(url, json_data, timeout=0.1):
+def httpPostRequest(url, json_data, timeout=1.0):
     """ Call HTTP request catching all errors """
     try:
         log("URL Post: " + url)
@@ -391,9 +391,18 @@ def process_event(assistant, led, event):
             try:
                 assistant.stop_conversation()
                 radio_name = text.split("mets la radio", 1)[1].strip()
-                radio_id = radio_id_list[radio_name]
+                radio_url = ""
+                if radio_name in radio_id_list:
+                    radio_url = "plugin://plugin.audio.radio_de/station/"+str(radio_id_list[radio_name])
+                else:
+                    resp_radio = httpPostRequest("http://osmc:8080/jsonrpc?FileCollection", {"jsonrpc":"2.0","method":"Files.GetDirectory","id":"1","params":{"directory":"plugin://plugin.audio.radio_de/stations/top/1","media":"music","properties":["title","file","mimetype","thumbnail","dateadded"],"sort":{"method":"none","order":"descending"}}}, timeout=10.0)
+                    radio_json = resp_radio.json()['result']['files']
+                    for radio_desc in radio_json:
+                        if radio_name == radio_desc['label'].lower():
+                            radio_url = radio_desc['file']
+                            break
                 httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Clear", {"jsonrpc":"2.0","method":"Playlist.Clear","params":[0],"id":1})
-                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Insert", {"jsonrpc":"2.0","method":"Playlist.Insert","params":[0,0,{"file":"plugin://plugin.audio.radio_de/station/"+str(radio_id)}],"id":2})
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Insert", {"jsonrpc":"2.0","method":"Playlist.Insert","params":[0,0,{"file":radio_url}],"id":2})
                 httpPostRequest("http://osmc:8080/jsonrpc?Playlist.open", {"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":0,"playlistid":0},"options":{}},"id":3})
             except Exception as ex:
                 log_exception(ex)
