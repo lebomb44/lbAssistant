@@ -30,6 +30,7 @@ import time
 import requests
 import threading
 import schedule
+import traceback
 
 import w1Temp
 import remote
@@ -46,21 +47,46 @@ notification_is_on = True
 schedule_watering = False
 
 nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
+radio_id_list = dict({'france info': 4232})
+
 
 def log(msg):
-    """ Print log message with date """
-    print(time.strftime('%Y/%m/%d %H:%M:%S: ') + msg)
+    """ Print message with time header """
+    try:
+        print(time.strftime('%Y/%m/%d %H:%M:%S: ') + str(msg))
+    except Exception as ex:
+        log_exception(ex)
 
 
-def httpRequest(url):
+def log_exception(ex, msg="ERROR Exception"):
+    """ Print exception with a time header """
+    log(msg + ": " + str(ex))
+    log(traceback.format_exc())
+
+
+def httpRequest(url, timeout=0.1):
     """ Call HTTP request catching all errors """
     try:
-        log("URL call: " + url)
-        resp = requests.get(url, timeout=0.1)
+        log("URL Get: " + url)
+        resp = requests.get(url, timeout=timeout)
         if resp.status_code != 200:
             lbSay("La requete a échoué")
         return resp
-    except:
+    except Exception as ex:
+        log_exception(ex)
+        return None
+
+
+def httpPostRequest(url, json_data, timeout=0.1):
+    """ Call HTTP request catching all errors """
+    try:
+        log("URL Post: " + url)
+        resp = requests.post(url, json=json_data, timeout=timeout)
+        if resp.status_code != 200:
+            lbSay("La requete a échoué")
+        return resp
+    except Exception as ex:
+        log_exception(ex)
         return None
 
 
@@ -335,7 +361,8 @@ def process_event(assistant, led, event):
             lbsay("L'arrosage automatique est désactivé")
         elif text == "coupe le son de kodi":
             assistant.stop_conversation()
-            httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
+            #httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
+            httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[True],"id":1})
         elif text == "mets le son de kodi à fond":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volmax/set/")
@@ -345,6 +372,9 @@ def process_event(assistant, led, event):
             if volPer in nombres:
                 volPer = nombres[volPer]
             httpRequest("http://osmc:8444/api/volcontrol/vol/set/" + str(volPer))
+        elif "mets le son de kodi" in text:
+            assistant.stop_conversation()
+            httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[False],"id":1})
         elif text == "baisse le son de kodi":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/voldown/set")
@@ -357,6 +387,20 @@ def process_event(assistant, led, event):
         elif text == "allume l'ampli":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/on/set")
+        elif "mets la radio" in text:
+            try:
+                assistant.stop_conversation()
+                radio_name = text.split("mets la radio", 1)[1].strip()
+                radio_id = radio_id_list[radio_name]
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Clear", {"jsonrpc":"2.0","method":"Playlist.Clear","params":[0],"id":1})
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Insert", {"jsonrpc":"2.0","method":"Playlist.Insert","params":[0,0,{"file":"plugin://plugin.audio.radio_de/station/"+str(radio_id)}],"id":2})
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.open", {"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":0,"playlistid":0},"options":{}},"id":3})
+            except Exception as ex:
+                log_exception(ex)
+                lbsay("Impossible de mettre la radio")
+        elif "stop kodi" in text or "arrête kodi" in text:
+            assistant.stop_conversation()
+            httpPostRequest("http://osmc:8080/jsonrpc?Player.Stop", {"jsonrpc":"2.0","method":"Player.Stop","params":[0],"id":1})
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
