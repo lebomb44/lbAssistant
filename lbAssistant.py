@@ -45,6 +45,8 @@ system_status = dict() #"Tous les systemes sont operationnels"
 notification_is_on = True
 schedule_watering = False
 
+nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
+
 def log(msg):
     """ Print log message with date """
     print(time.strftime('%Y/%m/%d %H:%M:%S: ') + msg)
@@ -334,12 +336,15 @@ def process_event(assistant, led, event):
         elif text == "coupe le son de kodi":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
-        elif text == "mets le son de kodi a":
+        elif text == "mets le son de kodi à fond":
             assistant.stop_conversation()
-            httpRequest("http://osmc:8444/api/volcontrol/vol/set/")
-        elif text == "mets le son de kodi a fond":
+            httpRequest("http://osmc:8444/api/volcontrol/volmax/set/")
+        elif "mets le son de kodi à" in text:
             assistant.stop_conversation()
-            httpRequest("http://osmc:8444/api/volcontrol/volmax/set")
+            volPer = text.split(" ")[6]
+            if volPer in nombres:
+                volPer = nombres[volPer]
+            httpRequest("http://osmc:8444/api/volcontrol/vol/set/" + str(volPer))
         elif text == "baisse le son de kodi":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/voldown/set")
