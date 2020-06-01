@@ -70,7 +70,7 @@ def httpRequest(url, timeout=0.1):
         log("URL Get: " + url)
         resp = requests.get(url, timeout=timeout)
         if resp.status_code != 200:
-            lbSay("La requete a échoué")
+            lbsay("La requete a échoué")
         return resp
     except Exception as ex:
         log_exception(ex)
@@ -83,7 +83,7 @@ def httpPostRequest(url, json_data, timeout=1.0):
         log("URL Post: " + url)
         resp = requests.post(url, json=json_data, timeout=timeout)
         if resp.status_code != 200:
-            lbSay("La requete a échoué")
+            lbsay("La requete a échoué")
         return resp
     except Exception as ex:
         log_exception(ex)
@@ -98,7 +98,8 @@ def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
         if notification_is_on is False:
             return
     if silent is False:
-        tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
+        subprocess.check_call('aplay -q -D default "/home/pi/lbAssistant/voices/' + text + '.wav' + '"', shell=True)
+        #tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
 
 def waterMainOn(silent=False):

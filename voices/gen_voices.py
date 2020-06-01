@@ -1,10 +1,13 @@
 import gtts
+import subprocess
 
 def lbsay(text):
     tts = gtts.gTTS(text=text, lang='fr-FR')
-    file_name = text + ".mp3"
-    tts.save(file_name)
-    print("File " + file_name)
+    file_mp3 = text + ".mp3"
+    file_wav = text + ".wav"
+    tts.save(file_mp3)
+    subprocess.check_call('lame --decode "' + file_mp3 + '" "' + file_wav + '"', shell=True)
+    print("File " + file_wav)
 
 lbsay("La requete a échoué")
 lbsay("La pompe est en marche")
