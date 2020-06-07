@@ -90,7 +90,7 @@ def httpPostRequest(url, json_data, timeout=1.0):
         return None
 
 
-def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
+def lbsay(text, volume=50, speed=100, isNotification=False, silent=False):
     """ Text to speech """
     global notification_is_on
     log("I said: " + text)
@@ -98,8 +98,8 @@ def lbsay(text, volume=60, speed=100, isNotification=False, silent=False):
         if notification_is_on is False:
             return
     if silent is False:
-        subprocess.check_call('aplay -q -D default "/home/pi/lbAssistant/voices/' + text + '.wav' + '"', shell=True)
-        #tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
+        #subprocess.check_call('aplay -q -D default "/home/pi/lbAssistant/voices/' + text + '.wav' + '"', shell=True)
+        tts.say(text, lang="fr-FR", pitch=100, volume=volume, speed=speed)
 
 
 def waterMainOn(silent=False):
