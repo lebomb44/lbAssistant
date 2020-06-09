@@ -156,3 +156,12 @@ Instructions from: https://www.legeek.info/2019/04/24/raspberry-pi-3-point-dacce
 sudo vi /etc/default/hostapd
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
 ```
+
+Authorize all the users to start and stop the access point
+```shell
+sudo visudo -f /etc/sudoers.d/hostapd
+```
+File contents:
+```shell
+pi      ALL = (ALL) NOPASSWD: /usr/bin/sudo /usr/sbin/service hostapd stop
+```
