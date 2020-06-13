@@ -119,13 +119,11 @@ def waterMainOff(silent=False):
 
 
 def schedule_waterMainOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterMainOff(silent=True)
+    waterMainOff(silent=True)
 
 
 def waterSideOn(silent=False):
-    lbsay('L\'arrosage sur le coté est en marche', silent=silent)
+    lbsay("L'arrosage sur le coté est en marche", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterSideRelay/set/1")
 
 
@@ -136,18 +134,16 @@ def schedule_waterSideOn():
 
 
 def waterSideOff(silent=False):
-    lbsay('L\'arrosage sur le coté est arrêtée', silent=silent)
+    lbsay("L'arrosage sur le coté est arrêtée", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterSideRelay/set/0")
 
 
 def schedule_waterSideOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterSideOff(silent=True)
+    waterSideOff(silent=True)
 
 
 def waterEastOn(silent=False):
-    lbsay('L\'arrosage est est en marche', silent=silent)
+    lbsay("L'arrosage est est en marche", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterEastRelay/set/1")
 
 
@@ -158,18 +154,16 @@ def schedule_waterEastOn():
 
 
 def waterEastOff(silent=False):
-    lbsay('L\'arrosage est est arrêtée', silent=silent)
+    lbsay("L'arrosage est est arrêtée", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterEastRelay/set/0")
 
 
 def schedule_waterEastOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterEastOff(silent=True)
+    waterEastOff(silent=True)
 
 
 def waterWestOn(silent=False):
-    lbsay('L\'arrosage ouest est en marche', silent=silent)
+    lbsay("L'arrosage ouest est en marche", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterWestRelay/set/1")
 
 
@@ -180,18 +174,16 @@ def schedule_waterWestOn():
 
 
 def waterWestOff(silent=False):
-    lbsay('L\'arrosage ouest est arrêtée', silent=silent)
+    lbsay("L'arrosage ouest est arrêtée", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterWestRelay/set/0")
 
 
 def schedule_waterWestOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterWestOff(silent=True)
+    waterWestOff(silent=True)
 
 
 def waterSouthOn(silent=False):
-    lbsay('L\'arrosage sud est en marche', silent=silent)
+    lbsay("L'arrosage sud est en marche", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterSouthRelay/set/1")
 
 
@@ -202,14 +194,12 @@ def schedule_waterSouthOn():
 
 
 def waterSouthOff(silent=False):
-    lbsay('L\'arrosage sud est arrêtée', silent=silent)
+    lbsay("L'arrosage sud est arrêtée", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterSouthRelay/set/0")
 
 
 def schedule_waterSouthOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterSouthOff(silent=True)
+    waterSouthOff(silent=True)
 
 
 def waterGardenOn(silent=False):
@@ -225,15 +215,13 @@ def schedule_waterGardenOn():
 
 
 def waterGardenOff(silent=False):
-    lbsay('La pompe et l\'eau du potager sont arrêtés', silent=silent)
+    lbsay("La pompe et l'eau du potager sont arrêtés", silent=silent)
     httpRequest("http://jeedom:8444/api/ext/waterMainRelay/set/0")
     httpRequest("http://jeedom:8444/api/ext/waterGardenRelay/set/0")
 
 
 def schedule_waterGardenOff():
-    global schedule_watering
-    if schedule_watering is True:
-        waterGardenOff(silent=True)
+    waterGardenOff(silent=True)
 
 
 def diningShutterOpen(silent=False):
