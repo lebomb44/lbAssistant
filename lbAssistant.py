@@ -24,6 +24,7 @@ It is available for Raspberry Pi 2/3 only; Pi Zero is not supported.
 import logging
 import platform
 import subprocess
+import signal
 import sys
 import os
 import time
@@ -31,6 +32,8 @@ import requests
 import threading
 import schedule
 import traceback
+import http.server
+import json
 
 import w1Temp
 import remote
@@ -49,6 +52,7 @@ schedule_watering = False
 nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
 radio_id_list = dict({'france info': 4232, 'rire et chansons': 5558})
 
+HTTPD_PORT = 8444
 
 def log(msg):
     """ Print message with time header """
@@ -248,6 +252,20 @@ def allShutterClose(silent=False):
     httpRequest("http://jeedom:8444/api/rts/OFF/ID/22/RTS")
 
 
+def wifiOff(silent=False):
+    subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd stop', shell=True)
+    lbsay("Ok", silent=silent)
+
+
+def schedule_wifiOff():
+    wifiOff(silent=True)
+
+
+def wifiOn(silent=False):
+    subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd start', shell=True)
+    lbsay("Ok", silent=silent)
+
+
 def process_event(assistant, led, event):
     global system_status
     global notification_is_on
@@ -411,12 +429,10 @@ def process_event(assistant, led, event):
             lbsay("Ok")
         elif "allume le wifi" in text:
             assistant.stop_conversation()
-            subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd start', shell=True)
-            lbsay("Ok")
+            wifiOn()
         elif "arrête le wifi" in text:
             assistant.stop_conversation()
-            subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd stop', shell=True)
-            lbsay("Ok")
+            wifiOff()
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
     elif (event.type == EventType.ON_CONVERSATION_TURN_FINISHED
@@ -459,10 +475,93 @@ def schedule_thread(schedule):
         time.sleep(1)
 
 
+class CustomHandler(http.server.BaseHTTPRequestHandler):
+    """ Custom HTTP handler """
+    def ok200(self, resp, content_type='text/plain'):
+        """ Return OK page """
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', content_type)
+            self.end_headers()
+            if content_type == 'text/plain':
+                self.wfile.write((time.strftime('%Y/%m/%d %H:%M:%S: ') + resp).encode())
+            else:
+                self.wfile.write((resp).encode())
+        except Exception as ex:
+            log_exception(ex)
+
+    def error404(self, resp):
+        """ Return page not found """
+        try:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write((time.strftime('%Y/%m/%d %H:%M:%S: ') + resp).encode())
+        except Exception as ex:
+            log_exception(ex)
+
+    def log_message(self, format, *args):
+        """ Overwrite default log function """
+        return
+
+    def do_GET(self):
+        """ Callback on HTTP GET request """
+        url_tokens = self.path.split('/')
+        url_tokens_len = len(url_tokens)
+        log(str(url_tokens))
+        if url_tokens_len > 1:
+            api = url_tokens[1]
+            if api == "api":
+                if url_tokens_len > 2:
+                    node = url_tokens[2]
+                    if node == "assistant":
+                        if url_tokens_len > 3:
+                            cmd = url_tokens[3]
+                            if cmd == "say":
+                                if url_tokens_len > 4:
+                                    msg = ""
+                                    for word in url_tokens[4:]:
+                                        msg += word + " "
+                                    lbsay(msg)
+                                    self.ok200("Assistant said: " + msg)
+                                else:
+                                    self.error404("Bad length for command '" + cmd + "'")
+                            elif cmd == "json":
+                                temp_json = dict()
+                                temp_json['system_status'] = system_status
+                                temp_json['notification_is_on'] = notification_is_on
+                                temp_json['schedule_watering'] = schedule_watering
+                                temp_json['HTTPD_PORT'] = HTTPD_PORT
+                                self.ok200(json.dumps(temp_json, sort_keys=True, indent=4), content_type="application/json")
+                            else:
+                                self.error404("Bad command '" + cmd + "' for node '" + node + "'")
+                        else:
+                            self.error404("Bad length in node '" + node + "'")
+                    else:
+                        self.error404("Bad node: " + node)
+                else:
+                    self.error404("Command too short: " + api)
+            else:
+                self.error404("Bad location: " + api)
+        else:
+            self.error404("Url too short")
+
+
+http_server = http.server.HTTPServer(("", HTTPD_PORT), CustomHandler)
+
+def http_thread():
+    global http_server
+    log("Serving at port " + str(HTTPD_PORT))
+    try:
+        http_server.serve_forever()
+    except KeyboardInterrupt:
+        exit()
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
     credentials = auth_helpers.get_assistant_credentials()
     with Board() as board, Assistant(credentials) as assistant:
+        schedule.every().day.at("00:59").do(schedule_wifiOff)
         schedule.every().day.at("01:00").do(schedule_waterMainOn)
         schedule.every().day.at("01:01").do(schedule_waterSideOn)
         schedule.every().day.at("01:15").do(schedule_waterSideOff)
@@ -476,8 +575,10 @@ def main():
         #schedule.every().day.at("07:30").do(sayWeather, assistant)
         #schedule.every().day.at("07:45").do(sayWorkPath, assistant)
         schedule.every(15).minutes.do(checkSystem, assistant)
-        worker_thread = threading.Thread(target=schedule_thread, args=(schedule,))
-        worker_thread.start()
+        schedule_thread_worker = threading.Thread(target=schedule_thread, args=(schedule,))
+        schedule_thread_worker.start()
+        http_thread_worker = threading.Thread(target=http_thread, args=())
+        http_thread_worker.start()
         checkSystem(assistant)
         for event in assistant.start():
             process_event(assistant, board.led, event)
