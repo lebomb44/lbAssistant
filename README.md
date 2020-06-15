@@ -165,3 +165,12 @@ File contents:
 ```shell
 pi      ALL = (ALL) NOPASSWD: /usr/bin/sudo /usr/sbin/service hostapd stop
 ```
+
+Disable onboard WiFi on Raspberry Pi 3
+```shell
+sudo vi /boot/config.txt
+```
+Add this line at the end of the file:
+```shell
+dtoverlay=pi3-disable-wifi
+```
