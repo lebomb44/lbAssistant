@@ -48,6 +48,7 @@ from aiy.voice import tts
 system_status = dict() #"Tous les systemes sont operationnels"
 notification_is_on = True
 schedule_watering = False
+wifi_is_on = False
 
 nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
 radio_id_list = dict({'france info': 4232, 'rire et chansons': 5558})
@@ -253,7 +254,9 @@ def allShutterClose(silent=False):
 
 
 def wifiOff(silent=False):
+    global wifi_is_on
     subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd stop', shell=True)
+    wifi_is_on = False
     lbsay("Ok", silent=silent)
 
 
@@ -262,7 +265,9 @@ def schedule_wifiOff():
 
 
 def wifiOn(silent=False):
+    global wifi_is_on
     subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd start', shell=True)
+    wifi_is_on = True
     lbsay("Ok", silent=silent)
 
 
@@ -525,12 +530,28 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
                                     self.ok200("Assistant said: " + msg)
                                 else:
                                     self.error404("Bad length for command '" + cmd + "'")
+                            elif cmd == "wifi":
+                                if url_tokens_len == 6:
+                                    if url_tokens[5] == "set":
+                                        if url_tokens[4] == "off":
+                                            wifiOff(silent=True)
+                                            self.ok200("wifi off set")
+                                        elif url_tokens[4] == "on":
+                                            wifiOn(silent=True)
+                                            self.ok200("wifi on set")
+                                        else:
+                                            self.error404("Bad sub-command in commend '" + cmd + "'")
+                                    else:
+                                        self.error404("Bad end-command for '" + cmd + "'")
+                                else:
+                                    self.error404("Bad length for command '" + cmd + "'")
                             elif cmd == "json":
                                 temp_json = dict()
                                 temp_json['system_status'] = system_status
                                 temp_json['notification_is_on'] = notification_is_on
                                 temp_json['schedule_watering'] = schedule_watering
                                 temp_json['HTTPD_PORT'] = HTTPD_PORT
+                                temp_json['wifi_is_on'] = wifi_is_on
                                 self.ok200(json.dumps(temp_json, sort_keys=True, indent=4), content_type="application/json")
                             else:
                                 self.error404("Bad command '" + cmd + "' for node '" + node + "'")
