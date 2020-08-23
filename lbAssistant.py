@@ -302,6 +302,12 @@ def process_event(assistant, led, event):
         elif text == 'ferme les volets du salon':
             assistant.stop_conversation()
             diningShutterClose()
+        elif text == 'ouvre tous les volets du salon':
+            assistant.stop_conversation()
+            diningShutterOpen()
+        elif text == 'ferme tous les volets du salon':
+            assistant.stop_conversation()
+            diningShutterClose()
         elif text == 'ouvre tous les volets':
             assistant.stop_conversation()
             allShutterOpen()
