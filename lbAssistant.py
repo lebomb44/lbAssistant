@@ -316,6 +316,15 @@ def process_event(assistant, led, event):
             allShutterClose()
         elif text == 'combien fait-il':
             assistant.stop_conversation()
+            temp = "inconnue"
+            try:
+                resp = httpRequest("http://jeedom:8444/api/lbgate/json")
+                temp = str(round(int(resp.json()['ext']['tempSensors']['287979C8070000D1']['val']), 1))
+            except:
+                pass
+            lbsay('Il fait, ' + w1Temp.read_temp() + ' dedans et, ' + temp + ' dehors', speed=90)
+        elif text == "combien fait-il à l'intérieur":
+            assistant.stop_conversation()
             lbsay('La température est de, ' + w1Temp.read_temp() + ' degrés Celsius', speed=80)
         elif text == 'combien fait-il dehors':
             assistant.stop_conversation()
