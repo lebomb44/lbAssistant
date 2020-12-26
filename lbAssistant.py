@@ -567,6 +567,7 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
                                 temp_json['schedule_watering'] = schedule_watering
                                 temp_json['HTTPD_PORT'] = HTTPD_PORT
                                 temp_json['wifi_is_on'] = wifi_is_on
+                                temp_json['temperature'] = w1Temp.read_temp()
                                 self.ok200(json.dumps(temp_json, sort_keys=True, indent=4), content_type="application/json")
                             else:
                                 self.error404("Bad command '" + cmd + "' for node '" + node + "'")
