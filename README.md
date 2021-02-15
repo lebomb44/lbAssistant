@@ -8,7 +8,7 @@ Description=My awesome assistant app
 
 [Service]
 Environment=XDG_RUNTIME_DIR=/run/user/1000
-ExecStart=/bin/bash -c 'python3 -u lbAssistant.py'
+ExecStart=/bin/bash -c 'python3 -u lbAssistant.py  >> /tmp/lbAssistant 2>&1'
 WorkingDirectory=/home/pi
 Restart=always
 User=pi
