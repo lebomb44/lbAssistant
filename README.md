@@ -28,6 +28,15 @@ Start the service
 ```shell
 sudo service lbAssistant start
 ```
+Open Web Browser at startup in kios mode
+```shell
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+/usr/bin/chromium-browser --kiosk --disable-restore-session-state http://localhost:8080/#/Dashboard
+```
+
 # WIFI access point
 
 Instructions from: https://www.raspberrypi.org/documentation/configuration/wireless/access-point-bridged.md
