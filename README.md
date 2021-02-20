@@ -34,7 +34,7 @@ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
 @xscreensaver -no-splash
-/usr/bin/chromium-browser --kiosk --disable-restore-session-state http://localhost:8080/#/Dashboard
+/usr/bin/chromium-browser --kiosk --disable-restore-session-state http://jeedom
 ```
 
 # WIFI access point
