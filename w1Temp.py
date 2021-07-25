@@ -8,7 +8,7 @@ import subprocess
 def read_temp():
     """ Read temperature sensor from one wire link """
     try:
-        device_file = "/sys/bus/w1/devices/28-3c01e076c976/w1_slave"
+        device_file = "/sys/bus/w1/devices/28-000007aec63e/w1_slave"
         catdata = subprocess.Popen(['cat', device_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = catdata.communicate()
         out_decode = out.decode('utf-8')
