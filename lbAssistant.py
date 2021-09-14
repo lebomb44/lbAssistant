@@ -37,6 +37,7 @@ import json
 
 import w1Temp
 import remote
+import lbserial
 
 from google.assistant.library.event import EventType
 
@@ -52,6 +53,15 @@ wifi_is_on = False
 
 nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 5, 'six': 6, 'sept': 7, 'huit': 8, 'neuf': 9})
 radio_id_list = dict({'france info': 4232, 'rire et chansons': 5558})
+acq = dict({
+    'beetleTemp': {
+        'ping': {'val': 0, 'fct': "timeout_reset"},
+        'tempSensors': {'287979C8070000D1': {'val': 20.0, 'name': "antenna", 'type': ["temp"]}}
+    }
+})
+node_list = dict(
+    beetleTemp=lbserial.Serial('beetleTemp', acq))
+
 
 HTTPD_PORT = 8444
 
@@ -541,7 +551,17 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
             if api == "api":
                 if url_tokens_len > 2:
                     node = url_tokens[2]
-                    if node == "assistant":
+                    if node in node_list:
+                        if url_tokens_len > 3:
+                            cmd = url_tokens[3]
+                            if url_tokens_len > 4:
+                                for token in url_tokens[4:]:
+                                    cmd = cmd + " " + token
+                            node_list[node].write(cmd)
+                            self.ok200(node + " " + cmd)
+                        else:
+                            self.error404("No command for node: " + node)
+                    elif node == "assistant":
                         if url_tokens_len > 3:
                             cmd = url_tokens[3]
                             if cmd == "say":
