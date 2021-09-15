@@ -35,7 +35,6 @@ import traceback
 import http.server
 import json
 
-import w1Temp
 import remote
 import lbserial
 
@@ -55,8 +54,7 @@ nombres = dict({'zero': 0, 'un': 1, 'deux': 2, 'trois': 3, 'quatre': 4, 'cinq': 
 radio_id_list = dict({'france info': 4232, 'rire et chansons': 5558})
 acq = dict({
     'beetleTemp': {
-        'ping': {'val': 0, 'fct': "timeout_reset"},
-        'tempSensors': {'287979C8070000D1': {'val': 20.0, 'name': "antenna", 'type': ["temp"]}}
+        'tempSensors': {'424545544C455445': {'val': 20.0, 'name': "phone", 'type': ["temp"]}, 'fct_after_set': "timeout_reset"}
     }
 })
 node_list = dict(
@@ -285,6 +283,7 @@ def process_event(assistant, led, event):
     global system_status
     global notification_is_on
     global schedule_watering
+    global acq
     logging.info(event)
     if event.type == EventType.ON_START_FINISHED:
         led.state = Led.BEACON_DARK  # Ready.
@@ -332,10 +331,10 @@ def process_event(assistant, led, event):
                 temp = str(round(int(resp.json()['ext']['tempSensors']['287979C8070000D1']['val']), 1))
             except:
                 pass
-            lbsay('Il fait, ' + w1Temp.read_temp() + ' dedans et, ' + temp + ' dehors', speed=90)
+            lbsay('Il fait, ' + str(round(acq["beetleTemp"]["tempSensors"]["424545544C455445"]["val"], 1)) + ' dedans et, ' + temp + ' dehors', speed=90)
         elif text == "combien fait-il à l'intérieur":
             assistant.stop_conversation()
-            lbsay('La température est de, ' + w1Temp.read_temp() + ' degrés Celsius', speed=80)
+            lbsay('La température est de, ' + str(round(acq["beetleTemp"]["tempSensors"]["424545544C455445"]["val"], 1)) + ' degrés Celsius', speed=80)
         elif text == 'combien fait-il dehors':
             assistant.stop_conversation()
             temp = "inconnue"
@@ -543,6 +542,7 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         """ Callback on HTTP GET request """
+        global acq
         url_tokens = self.path.split('/')
         url_tokens_len = len(url_tokens)
         log(str(url_tokens))
@@ -595,8 +595,17 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
                                 temp_json['schedule_watering'] = schedule_watering
                                 temp_json['HTTPD_PORT'] = HTTPD_PORT
                                 temp_json['wifi_is_on'] = wifi_is_on
-                                temp_json['temperature'] = w1Temp.read_temp()
+                                temp_json['temperature'] = round(acq["beetleTemp"]["tempSensors"]["424545544C455445"]["val"], 1)
                                 self.ok200(json.dumps(temp_json, sort_keys=True, indent=4), content_type="application/json")
+                            elif cmd == "acq":
+                                try:
+                                    token_nbs = range(4, url_tokens_len)
+                                    node_point = acq
+                                    for token_index in token_nbs:
+                                        node_point = node_point[url_tokens[token_index]]
+                                    self.ok200(json.dumps(node_point, sort_keys=True, indent=4), content_type="application/json")
+                                except:
+                                    self.error404("Bad path in 'acq'")
                             else:
                                 self.error404("Bad command '" + cmd + "' for node '" + node + "'")
                         else:
@@ -623,6 +632,7 @@ def http_thread():
 
 
 def main():
+    global node_list
     logging.basicConfig(level=logging.INFO)
     credentials = auth_helpers.get_assistant_credentials()
     with Board() as board, Assistant(credentials) as assistant:
@@ -644,6 +654,8 @@ def main():
         schedule_thread_worker.start()
         http_thread_worker = threading.Thread(target=http_thread, args=())
         http_thread_worker.start()
+        for key, value in node_list.items():
+            value.start()
         checkSystem(assistant)
         for event in assistant.start():
             process_event(assistant, board.led, event)

@@ -74,7 +74,7 @@ class Serial(threading.Thread):
                             if (self.line != "") and (cserial == "\n" or cserial == "\r"):
                                 line = self.line
                                 self.line = ""
-                                # log("DEBUG New line create=" + line)
+                                #log("DEBUG New line create=" + line)
                                 break
                             else:
                                 if (cserial != "\n") and (cserial != "\r"):
@@ -97,7 +97,7 @@ class Serial(threading.Thread):
                                     arg_map = line_array[2:]
                                     if 'fct' in self.acq[node][cmd]:
                                         try:
-                                            fct_to_run = getattr(fct, self.acq[node][cmd]['fct'])
+                                            fct_to_run = getattr(self, self.acq[node][cmd]['fct'])
                                             fct_to_run(node, cmd, arg_map)
                                         except Exception as ex:
                                             log_exception(ex)
@@ -105,6 +105,12 @@ class Serial(threading.Thread):
                                         if len(arg_map) == 2:
                                             if arg_map[0] in self.acq[node][cmd]:
                                                 self.acq[node][cmd][arg_map[0]] = type(self.acq[node][cmd][arg_map[0]])(arg_map[1])
+                                                if 'fct_after_set' in self.acq[node][cmd]:
+                                                    try:
+                                                        fct_to_run = getattr(self, self.acq[node][cmd]['fct'])
+                                                        fct_to_run(node, cmd, arg_map)
+                                                    except Exception as ex:
+                                                        log_exception(ex)
                                             else:
                                                 log("ERROR: " + arg_map[0] + " is not in cmd " + node + "." + cmd)
                                         else:
@@ -112,6 +118,12 @@ class Serial(threading.Thread):
                                                 if arg_map[0] in self.acq[node][cmd]:
                                                     if arg_map[1] in self.acq[node][cmd][arg_map[0]]:
                                                         self.acq[node][cmd][arg_map[0]][arg_map[1]] = type(self.acq[node][cmd][arg_map[0]][arg_map[1]])(arg_map[2])
+                                                        if 'fct' in self.acq[node][cmd]:
+                                                            try:
+                                                                fct_to_run = getattr(self, self.acq[node][cmd]['fct'])
+                                                                fct_to_run(node, cmd, arg_map)
+                                                            except Exception as ex:
+                                                                log_exception(ex)
                                                     else:
                                                         log("ERROR: " + arg_map[1] + " is not in cmd " + node + "." + cmd + "." + arg_map[0])
                                                 else:
@@ -125,10 +137,6 @@ class Serial(threading.Thread):
                                 log("ERROR: node '" + node + "' is unknown")
                         else:
                             log("ERROR: line '" + line + "' is too short")
-                    if loop_nb % 500 == 0:
-                        self.write("ping get")
-                        # log("DEBUG PING to node " + node)
-                        self.ping_tx_cnt += 1
             except Exception as ex:
                 log_exception(ex)
                 self.close()
@@ -201,4 +209,13 @@ class Serial(threading.Thread):
             self.close()
             time.sleep(1.0)
             self.open()
+
+
+    def timeout_reset(self, node_, cmd_, arg_array_):
+        """ Reset timeout to zero """
+        #log("### Reset of " + node_ + " timeout")
+        if self.error_cnt > self.error_cnt_max:
+            self.error_cnt_max = self.error_cnt
+        self.error_cnt = 0
+        self.ping_rx_cnt += 1
 
