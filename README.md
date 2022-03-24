@@ -37,6 +37,13 @@ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 /usr/bin/chromium-browser --kiosk --disable-restore-session-state http://jeedom
 ```
 
+# APT
+
+```shell
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo apt update
+```
+
 # WIFI access point
 
 Instructions from: https://www.raspberrypi.org/documentation/configuration/wireless/access-point-bridged.md
