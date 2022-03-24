@@ -40,7 +40,7 @@ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 # APT
 
 ```shell
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt update
 ```
 
