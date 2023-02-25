@@ -250,9 +250,10 @@ def diningShutterClose(silent=False):
 
 
 def allShutterOpen(silent=False):
-    lbsay('Ouverture de tous les volets', silent=silent)
+    #lbsay('Ouverture de tous les volets', silent=silent)
+    lbsay("On t'as deja dit que c'était cassé ! Olivier n'a pas réparé !", silent=silent)
     #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
-    httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
+    #httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
 
 
 def allShutterClose(silent=False):
@@ -395,31 +396,31 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             schedule_watering = False
             lbsay("L'arrosage automatique est désactivé")
-        elif text == "coupe le son de kodi":
+        elif text == "coupe le son de jarvis":
             assistant.stop_conversation()
             #httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
             httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[True],"id":1})
             lbsay("Ok")
-        elif text == "mets le son de kodi à fond":
+        elif text == "mets le son de jarvis à fond":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volmax/set/")
             lbsay("Ok")
-        elif "mets le son de kodi à" in text:
+        elif "mets le son de jarvis à" in text:
             assistant.stop_conversation()
             volPer = text.split(" ")[6]
             if volPer in nombres:
                 volPer = nombres[volPer]
             httpRequest("http://osmc:8444/api/volcontrol/vol/set/" + str(volPer))
             lbsay("Ok")
-        elif "mets le son de kodi" in text:
+        elif "mets le son de jarvis" in text:
             assistant.stop_conversation()
             httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[False],"id":1})
             lbsay("Ok")
-        elif text == "baisse le son de kodi":
+        elif text == "baisse le son de jarvis":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/voldown/set")
             lbsay("Ok")
-        elif text == "monte le son de kodi":
+        elif text == "monte le son de jarvis":
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volup/set")
             lbsay("Ok")
@@ -431,6 +432,17 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/on/set")
             lbsay("Ok")
+        elif "mets du classique" in text:
+            try:
+                assistant.stop_conversation()
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Clear", {"jsonrpc":"2.0","method":"Playlist.Clear","params":[0],"id":1}, timeout=5.0)
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Insert", {"jsonrpc":"2.0","method":"Playlist.Insert","params":[0,0,{"file":"plugin://plugin.audio.radio_de/station/5039"}],"id":2}, timeout=5.0)
+                httpPostRequest("http://osmc:8080/jsonrpc?Playlist.open", {"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":0,"playlistid":0},"options":{}},"id":3}, timeout=5.0)
+                httpRequest("http://osmc:8444/api/volcontrol/on/set")
+                lbsay("Ok")
+            except Exception as ex:
+                log_exception(ex)
+                lbsay("Impossible de mettre du classique")
         elif "mets la radio" in text:
             try:
                 assistant.stop_conversation()
@@ -452,7 +464,7 @@ def process_event(assistant, led, event):
             except Exception as ex:
                 log_exception(ex)
                 lbsay("Impossible de mettre la radio")
-        elif "stop kodi" in text or "arrête kodi" in text:
+        elif "stoppe jarvis" in text or "arrête jarvis" in text:
             assistant.stop_conversation()
             httpPostRequest("http://osmc:8080/jsonrpc?Player.Stop", {"jsonrpc":"2.0","method":"Player.Stop","params":[0],"id":1})
             lbsay("Ok")
