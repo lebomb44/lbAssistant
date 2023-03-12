@@ -250,10 +250,9 @@ def diningShutterClose(silent=False):
 
 
 def allShutterOpen(silent=False):
-    #lbsay('Ouverture de tous les volets', silent=silent)
-    lbsay("On t'as deja dit que c'était cassé ! Olivier n'a pas réparé !", silent=silent)
-    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
-    #httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
+    lbsay('Ouverture de tous les volets', silent=silent)
+    httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
+    httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
 
 
 def allShutterClose(silent=False):
