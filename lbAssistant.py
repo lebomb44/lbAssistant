@@ -263,9 +263,10 @@ def allShutterClose(silent=False):
 
 def wifiOff(silent=False):
     global wifi_is_on
-    subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd stop', shell=True)
-    wifi_is_on = False
     lbsay("Ok", silent=silent)
+    #subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd stop', shell=True)
+    httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=414", timeout=3.0)
+    wifi_is_on = False
 
 
 def schedule_wifiOff():
@@ -274,9 +275,10 @@ def schedule_wifiOff():
 
 def wifiOn(silent=False):
     global wifi_is_on
-    subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd start', shell=True)
-    wifi_is_on = True
     lbsay("Ok", silent=silent)
+    #subprocess.check_call('/usr/bin/sudo /usr/sbin/service hostapd start', shell=True)
+    httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=412", timeout=3.0)
+    wifi_is_on = True
 
 
 def process_event(assistant, led, event):
@@ -369,6 +371,14 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             httpRequest("http://jeedom:8444/api/lbgate/alarm/disable")
             lbsay("L'alarme est arrêtée")
+        elif text == "configure l'alarme avec mouvement":
+            assistant.stop_conversation()
+            httpRequest("http://jeedom:8444/api/lbgate/alarm/use_move")
+            lbsay("L'alarme est configurée avec mouvements")
+        elif text == "configure l'alarme sans mouvement":
+            assistant.stop_conversation()
+            httpRequest("http://jeedom:8444/api/lbgate/alarm/nouse_move")
+            lbsay("L'alarme est configurée sans mouvements")
         elif text == "mets-nous en sécurité":
             assistant.stop_conversation()
             httpRequest("http://jeedom:8444/api/lbgate/perimeter/enable")
@@ -395,31 +405,31 @@ def process_event(assistant, led, event):
             assistant.stop_conversation()
             schedule_watering = False
             lbsay("L'arrosage automatique est désactivé")
-        elif text == "coupe le son de jarvis":
+        elif (text == "coupe le son de jarvis") or (text == "coupe le son de jardy"):
             assistant.stop_conversation()
             #httpRequest("http://osmc:8444/api/volcontrol/volmute/set")
             httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[True],"id":1})
             lbsay("Ok")
-        elif text == "mets le son de jarvis à fond":
+        elif (text == "mets le son de jarvis à fond") or (text == "mets le son de jardy à fond"):
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volmax/set/")
             lbsay("Ok")
-        elif "mets le son de jarvis à" in text:
+        elif ("mets le son de jarvis à" in text) or ("mets le son de jardy à" in text):
             assistant.stop_conversation()
             volPer = text.split(" ")[6]
             if volPer in nombres:
                 volPer = nombres[volPer]
             httpRequest("http://osmc:8444/api/volcontrol/vol/set/" + str(volPer))
             lbsay("Ok")
-        elif "mets le son de jarvis" in text:
+        elif ("mets le son de jarvis" in text) or ("mets le son de jardy" in text):
             assistant.stop_conversation()
             httpPostRequest("http://osmc:8080/jsonrpc?Application.SetMute", {"jsonrpc":"2.0","method":"Application.SetMute","params":[False],"id":1})
             lbsay("Ok")
-        elif text == "baisse le son de jarvis":
+        elif (text == "baisse le son de jarvis") or (text == "baisse le son de jardy"):
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/voldown/set")
             lbsay("Ok")
-        elif text == "monte le son de jarvis":
+        elif (text == "monte le son de jarvis") or (text == "monte le son de jardy"):
             assistant.stop_conversation()
             httpRequest("http://osmc:8444/api/volcontrol/volup/set")
             lbsay("Ok")
@@ -438,6 +448,7 @@ def process_event(assistant, led, event):
                 httpPostRequest("http://osmc:8080/jsonrpc?Playlist.Insert", {"jsonrpc":"2.0","method":"Playlist.Insert","params":[0,0,{"file":"plugin://plugin.audio.radio_de/station/5039"}],"id":2}, timeout=5.0)
                 httpPostRequest("http://osmc:8080/jsonrpc?Playlist.open", {"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":0,"playlistid":0},"options":{}},"id":3}, timeout=5.0)
                 httpRequest("http://osmc:8444/api/volcontrol/on/set")
+                httpRequest("http://osmc:8444/api/volcontrol/vol/set/10")
                 lbsay("Ok")
             except Exception as ex:
                 log_exception(ex)
@@ -463,7 +474,7 @@ def process_event(assistant, led, event):
             except Exception as ex:
                 log_exception(ex)
                 lbsay("Impossible de mettre la radio")
-        elif "stoppe jarvis" in text or "arrête jarvis" in text:
+        elif ("stoppe jarvis" in text) or ("arrête jarvis" in text) or ("arrête la musique" in text):
             assistant.stop_conversation()
             httpPostRequest("http://osmc:8080/jsonrpc?Player.Stop", {"jsonrpc":"2.0","method":"Player.Stop","params":[0],"id":1})
             lbsay("Ok")
@@ -631,7 +642,7 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
             self.error404("Url too short")
 
 
-http_server = http.server.HTTPServer(("", HTTPD_PORT), CustomHandler)
+http_server = http.server.ThreadingHTTPServer(("", HTTPD_PORT), CustomHandler)
 
 def http_thread():
     global http_server
