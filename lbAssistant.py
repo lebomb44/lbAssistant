@@ -239,25 +239,31 @@ def schedule_waterGardenOff():
 
 def diningShutterOpen(silent=False):
     lbsay('Ouverture des volets du salon', silent=silent)
-    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=132")
     httpRequest("http://jeedom:8444/api/rts/ON/ID/12/RTS")
 
 
 def diningShutterClose(silent=False):
     lbsay('Fermeture des volets du salon', silent=silent)
-    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=133")
     httpRequest("http://jeedom:8444/api/rts/OFF/ID/12/RTS")
+
+
+def nightShutterOpen(silent=False):
+    lbsay('Ouverture des volets des chambres', silent=silent)
+    httpRequest("http://jeedom:8444/api/rts/ON/ID/2/RTS")
+
+
+def nightShutterClose(silent=False):
+    lbsay('Fermeture des volets des chambres', silent=silent)
+    httpRequest("http://jeedom:8444/api/rts/OFF/ID/2/RTS")
 
 
 def allShutterOpen(silent=False):
     lbsay('Ouverture de tous les volets', silent=silent)
-    httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=152")
     httpRequest("http://jeedom:8444/api/rts/ON/ID/22/RTS")
 
 
 def allShutterClose(silent=False):
     lbsay('Fermeture de tous les volets', silent=silent)
-    #httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=153")
     httpRequest("http://jeedom:8444/api/rts/OFF/ID/22/RTS")
 
 
@@ -319,6 +325,12 @@ def process_event(assistant, led, event):
         elif text == 'ferme tous les volets du salon':
             assistant.stop_conversation()
             diningShutterClose()
+        elif text == 'ouvre les chambres':
+            assistant.stop_conversation()
+            nightShutterOpen()
+        elif text == 'ferme les chambres':
+            assistant.stop_conversation()
+            nightShutterClose()
         elif text == 'ouvre tous les volets':
             assistant.stop_conversation()
             allShutterOpen()
