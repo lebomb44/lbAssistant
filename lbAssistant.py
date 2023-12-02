@@ -313,22 +313,16 @@ def process_event(assistant, led, event):
         elif text == 'arrête le potager':
             assistant.stop_conversation()
             waterGardenOff()
-        elif text == 'ouvre les volets du salon':
+        elif (text == 'ouvre le salon') or (text == 'ouvre les volets du salon') or (text == 'ouvre tous les volets du salon'):
             assistant.stop_conversation()
             diningShutterOpen()
-        elif text == 'ferme les volets du salon':
+        elif (text == 'ferme le salon') or (text == 'ferme les volets du salon') or (text == 'ferme tous les volets du salon'):
             assistant.stop_conversation()
             diningShutterClose()
-        elif text == 'ouvre tous les volets du salon':
-            assistant.stop_conversation()
-            diningShutterOpen()
-        elif text == 'ferme tous les volets du salon':
-            assistant.stop_conversation()
-            diningShutterClose()
-        elif text == 'ouvre les chambres':
+        elif (text == 'ouvre les chambres') or (text == 'ouvre les volets des chambres') or (text == 'ouvre tous les volets des chambres'):
             assistant.stop_conversation()
             nightShutterOpen()
-        elif text == 'ferme les chambres':
+        elif (text == 'ferme les chambres') or (text == 'ferme les volets des chambres') or (text == 'ferme tous les volets des chambres'):
             assistant.stop_conversation()
             nightShutterClose()
         elif text == 'ouvre tous les volets':
