@@ -497,7 +497,7 @@ def process_event(assistant, led, event):
             httpRequest("http://jeedom:8444/api/heatpump/temp/set/19.0", timeout=2.0)
             httpRequest("http://jeedom:8444/api/heatpump/fanspeed/set/AUTO", timeout=2.0)
             lbsay("Mode confort activé")
-        elif "mets le chaffage en eco" in text:
+        elif "mets le chauffage en éco" in text:
             assistant.stop_conversation()
             httpRequest("http://jeedom:8444/api/heatpump/power/set/ON", timeout=2.0)
             httpRequest("http://jeedom:8444/api/heatpump/mode/set/HEAT", timeout=2.0)
