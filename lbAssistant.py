@@ -490,13 +490,19 @@ def process_event(assistant, led, event):
         elif "arrête le wifi" in text:
             assistant.stop_conversation()
             wifiOff()
-        elif "mets le mode confort" in text:
+        elif "mets le chauffage en confort" in text:
             assistant.stop_conversation()
-            httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=268", timeout=1.0)
+            httpRequest("http://jeedom:8444/api/heatpump/power/set/ON", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/mode/set/HEAT", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/temp/set/19.0", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/fanspeed/set/AUTO", timeout=2.0)
             lbsay("Mode confort activé")
-        elif "mets le mode eco" in text:
+        elif "mets le chaffage en eco" in text:
             assistant.stop_conversation()
-            httpRequest("http://jeedom/core/api/jeeApi.php?apikey=FddiT3sOcnrs5FcPh35kyTJLhQRdnFra&type=cmd&id=274", timeout=1.0)
+            httpRequest("http://jeedom:8444/api/heatpump/power/set/ON", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/mode/set/HEAT", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/temp/set/17.0", timeout=2.0)
+            httpRequest("http://jeedom:8444/api/heatpump/fanspeed/set/AUTO", timeout=2.0)
             lbsay("Mode éco activé")
     elif event.type == EventType.ON_END_OF_UTTERANCE:
         led.state = Led.PULSE_QUICK  # Thinking.
