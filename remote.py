@@ -28,7 +28,7 @@ def checkdisk(target, target_name, user, path, level=80):
                 if rate < level:
                     return ""
                 else:
-                    return "Disque plein a " + str(rate) + "% sur " + target_name + " a " + time.strftime('%Y/%m/%d %H:%M:%S: ')
+                    return "Disque plein a " + str(rate) + "% sur " + target_name
             else:
                 return "Longueur incorrecte a " + str(len(resp_array)) + " pour le test disque sur " + target_name + " a " + time.strftime('%Y/%m/%d %H:%M:%S: ')
         else:

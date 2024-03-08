@@ -493,8 +493,11 @@ def process_event(assistant, led, event):
         elif "mets le chauffage en confort" in text:
             assistant.stop_conversation()
             httpRequest("http://jeedom:8444/api/heatpump/power/set/ON", timeout=2.0)
+            time.sleep(3)
             httpRequest("http://jeedom:8444/api/heatpump/mode/set/HEAT", timeout=2.0)
+            time.sleep(1)
             httpRequest("http://jeedom:8444/api/heatpump/temp/set/19.0", timeout=2.0)
+            time.sleep(1)
             httpRequest("http://jeedom:8444/api/heatpump/fanspeed/set/AUTO", timeout=2.0)
             lbsay("Mode confort activé")
         elif ("mets le chauffage en éco" in text) or ("mets le chauffage en écho" in text):
@@ -533,7 +536,7 @@ def checkSystem(assistant):
     log("Checking system")
     system_status["osmc_disk"] = remote.checkdisk("osmc", "'O S M C' racine", "osmc", "/")
     system_status["osmc_hdd"] = remote.checkdisk("osmc", "'O S M C' 'H D D'", "osmc", "/media/HDD", 95)
-    system_status["osmc_http"] = remote.checkhttp("https://snosno.freeboxos.fr/ping", "'O S M C' ping", "pong")
+    #system_status["osmc_http"] = remote.checkhttp("https://home/ping", "'O S M C' ping", "pong")
     system_status["jeedom_disk"] = remote.checkdisk("jeedom", "JIDOM", "pi", "/")
     #system_status["camdining_disk"] = remote.checkdisk("camdining", "CAM DINING", "pi", "/")
     #system_status["camentry_disk"] = remote.checkdisk("camentry", "CAM ENTRY", "pi", "/")
